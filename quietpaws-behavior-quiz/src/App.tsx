@@ -132,8 +132,8 @@ export default function App() {
   }, [currentStep]);
 
   return (
-    <div className="min-h-screen bg-brand-bg font-sans selection:bg-brand-primary/20">
-      {/* Live Social Proof Bubble (Desktop only or floating) */}
+    <div className="min-h-screen flex flex-col bg-brand-bg font-sans relative overflow-x-hidden">
+      {/* Live Social Proof Bubble (Desktop only) */}
       <AnimatePresence>
         {currentStep < 2 && (
           <motion.div 
@@ -141,38 +141,30 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
             key={liveProof.name}
-            className="fixed bottom-6 left-6 z-50 bg-white/95 backdrop-blur-md border border-slate-200 shadow-2xl rounded-2xl p-4 flex items-center gap-3 max-w-[280px] pointer-events-none hidden md:flex"
+            className="fixed bottom-12 left-6 z-50 bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg rounded-2xl p-3 items-center gap-3 max-w-[240px] pointer-events-none hidden lg:flex"
           >
-            <div className="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary shrink-0">
-              <Users className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary">
+              <Users className="w-4 h-4" />
             </div>
             <div className="flex flex-col">
-              <p className="text-xs font-bold text-slate-800 leading-tight">{liveProof.name}</p>
-              <p className="text-[10px] text-gray-500 uppercase tracking-tighter font-semibold">Completed Assessment • {liveProof.time}</p>
+              <p className="text-[10px] font-bold text-slate-800 leading-tight">{liveProof.name}</p>
+              <p className="text-[9px] text-gray-500 uppercase tracking-tighter">Completed Assessment • {liveProof.time}</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="w-full max-w-4xl mx-auto min-h-screen flex flex-col px-4 md:px-8 py-8 md:py-12 transition-all duration-500">
-        {/* Header - Larger font as requested */}
+      <div className="flex-1 w-full max-w-2xl mx-auto flex flex-col py-8 px-6 md:px-12">
+        {/* Header: Simplified to Icon + Quiz Name */}
         <header className="flex flex-col items-center mb-12">
-          <div className="flex items-center gap-8 mb-8 opacity-40 grayscale contrast-125 overflow-hidden whitespace-nowrap">
-            <span className="text-xs font-black tracking-tighter uppercase italic">VET-TECH PREMIUM</span>
-            <span className="text-xs font-black tracking-tighter uppercase italic">CANINE DAILY</span>
-            <span className="text-xs font-black tracking-tighter uppercase italic">SHARP PAW</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-sm">
+              <Dog className="w-6 h-6" />
+            </div>
+            <span className="text-2xl md:text-3xl font-serif font-semibold tracking-tight text-slate-800">QuietPaws Lab</span>
           </div>
-          <div className="w-16 h-16 bg-white shadow-sm border border-slate-100 rounded-full flex items-center justify-center mb-4">
-            <Dog className="w-8 h-8 text-brand-primary" />
-          </div>
-          <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-brand-primary font-bold mb-2">
-            Certified Canine Behaviorist Assessment
-          </p>
-          <h1 className="text-3xl md:text-5xl font-semibold text-slate-800 text-center leading-tight max-w-2xl px-4">
-            Is Your Dog's Barking Disrupting Your Peace?
-          </h1>
-
-          <div className="w-full max-w-md loader-bar mt-10 relative">
+          
+          <div className="w-full loader-bar mt-8 relative max-w-sm">
             <motion.div 
               className="loader-progress relative" 
               initial={{ width: 0 }}
@@ -185,19 +177,10 @@ export default function App() {
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
               />
             </motion.div>
-            {/* Completion Pulse */}
-            {progress === 100 && (
-              <motion.div 
-                className="absolute inset-0 bg-brand-primary/20 rounded-full"
-                initial={{ scale: 1, opacity: 0.8 }}
-                animate={{ scale: 1.1, opacity: 0 }}
-                transition={{ duration: 0.8 }}
-              />
-            )}
           </div>
         </header>
 
-        <main className="flex-1 w-full max-w-2xl mx-auto">
+        <main className="flex-1 flex flex-col justify-center">
           <AnimatePresence mode="wait">
             {currentStep === 0 && (
               <motion.div
@@ -205,30 +188,29 @@ export default function App() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="space-y-8"
+                className="space-y-10"
               >
                 {/* Question Text */}
-                <div className="text-center space-y-4">
+                <div className="text-center">
                   <h2 className="text-2xl md:text-3xl font-semibold text-slate-800 leading-tight">
                     {QUESTIONS[currentQuestion].text}
                   </h2>
                 </div>
 
                 {/* Options */}
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-4 max-w-lg mx-auto w-full">
                   {QUESTIONS[currentQuestion].options.map((option) => (
                     <motion.button
                       key={option.value}
-                      whileHover={{ scale: 1.01, backgroundColor: "#ffffff", borderColor: "#7A9D96", boxShadow: "0 10px 20px -10px rgba(122, 157, 150, 0.1)" }}
+                      whileHover={{ y: -2, backgroundColor: "#ffffff", borderColor: "#cbd5e1", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleAnswer(option.value)}
-                      id={`option-${option.value}`}
-                      className="option-card group flex items-center justify-between p-6 md:p-8"
+                      className="w-full p-5 rounded-2xl border border-slate-200 bg-white/50 backdrop-blur-sm flex items-center justify-between text-left transition-all"
                     >
-                      <span className="text-lg md:text-xl font-medium text-slate-700 transition-colors">
+                      <span className="text-lg font-medium text-slate-700">
                         {option.label}
                       </span>
-                      <ChevronRight className="w-6 h-6 text-gray-300 group-hover:text-brand-primary" />
+                      <ChevronRight className="w-5 h-5 text-slate-300" />
                     </motion.button>
                   ))}
                 </div>
@@ -241,13 +223,13 @@ export default function App() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="h-[400px] flex flex-col items-center justify-center space-y-8 text-center"
+                className="flex flex-col items-center justify-center space-y-8 text-center"
               >
-                <div className="w-16 h-16 border-4 border-slate-100 border-t-brand-primary rounded-full animate-spin"></div>
-                <div className="space-y-4">
-                  <h2 className="text-3xl font-semibold text-slate-800 italic">Analyzing Canine Data...</h2>
-                  <p className="text-gray-500 text-lg leading-relaxed max-w-md mx-auto font-light">
-                    Generating your Home Serenity Plan based on behavior expert algorithms
+                <div className="w-16 h-16 border-4 border-slate-200 border-t-brand-primary rounded-full animate-spin"></div>
+                <div className="space-y-3">
+                  <h2 className="text-2xl font-semibold text-slate-800 italic">Analyzing Behavioral Data...</h2>
+                  <p className="text-gray-400 text-lg font-light max-w-sm mx-auto">
+                    Our algorithm is cross-referencing breed size with your reported triggers.
                   </p>
                 </div>
               </motion.div>
@@ -256,115 +238,102 @@ export default function App() {
             {currentStep === 2 && (
               <motion.div
                 key="result"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-12 pb-12"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-10 text-center flex flex-col items-center"
               >
-                <div className="text-center space-y-4">
-                  <div className="flex justify-center gap-1.5 mb-2">
+                <div className="space-y-4">
+                  <div className="flex justify-center gap-1.5">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="w-5 h-5 text-amber-400 fill-amber-400" />
+                      <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <h2 className="text-3xl md:text-5xl font-semibold text-slate-800">Your Serenity Plan is Ready</h2>
+                  <h2 className="text-3xl md:text-4xl font-semibold text-slate-800 leading-tight">Your Home Serenity Plan</h2>
                 </div>
                 
-                <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 relative">
+                <div className="max-w-xl bg-white/40 backdrop-blur-sm p-8 rounded-3xl border border-white/50 shadow-sm">
                   <p className="text-lg md:text-xl text-slate-600 leading-relaxed italic">
-                    "Based on your dog's triggers, we recommend a <span className="font-extrabold text-black text-[16px] bg-yellow-300 px-2 py-0.5 rounded-md shadow-md ring-1 ring-yellow-400/50">Passive Ultrasonic Intervention</span>. This method communicates in their language without stress, reducing bark incidents by up to 94%."
+                    "Based on your dog's triggers, we recommend a <span className="font-extrabold text-black bg-yellow-300 px-2 py-0.5 rounded-md shadow-md ring-1 ring-yellow-400/50">Passive Ultrasonic Intervention</span>. This method communicates in their language without stress, reducing bark incidents by up to 94%."
                   </p>
                 </div>
 
-                <div className="w-full h-48 md:h-64 bg-slate-50 rounded-[2rem] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 relative overflow-hidden group">
-                   <div className="absolute inset-0 bg-[url('./s4-prod.webp?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                   <Dog className="w-12 h-12 text-slate-300 mb-2 z-10" />
-                   <span className="text-xs text-gray-400 uppercase tracking-widest font-bold z-10 text-center px-6">Expert Recommended Device Preview</span>
-                </div>
-
-                {/* SWAPPED: CTA FIRST */}
-                <div className="space-y-6 max-w-lg mx-auto w-full">
+                {/* CTA BUTTON FIRST */}
+                <div className="w-full max-w-md space-y-4">
                   <motion.button
                     animate={{ scale: [1, 1.02, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="pinterest-btn bg-brand-secondary text-white py-6 text-lg tracking-widest shadow-2xl"
-                    id="final-cta"
+                    className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3"
                     onClick={() => window.location.href = 'https://go.wisecombo.com/click'}
                   >
-                    CLAIM EXPERT RECOMMENDATION
+                    <Award className="w-6 h-6" />
+                    Claim Your Device
                   </motion.button>
-                  
-                  <motion.button
-                    id="share-btn"
-                    whileHover={{ backgroundColor: "#ffffff", scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleShare}
-                    className="w-full py-4 px-6 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 border border-slate-200 text-slate-500 bg-white shadow-sm hover:shadow-md"
-                  >
-                    <Share2 className="w-5 h-5" />
-                    SHARE ASSESSMENT
-                  </motion.button>
-
-                  <p className="text-xs text-slate-400 uppercase tracking-widest font-bold text-center flex items-center justify-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-brand-primary" />
-                    Verified Solution for US Households
+                  <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] font-bold">
+                    Official Expert Recommended Solution
                   </p>
                 </div>
 
-                {/* SWAPPED: SOCIAL PROOF SECOND */}
-                <div className="space-y-8 pt-8 border-t border-slate-100">
-                  <div className="flex items-center justify-center gap-3 text-brand-primary text-sm font-bold uppercase tracking-widest bg-brand-primary/5 py-3 rounded-xl">
-                    <Award className="w-5 h-5" />
-                    Recommended by 450+ Licensed Trainers
+                <div className="w-full max-w-md aspect-video max-h-48 bg-slate-100 rounded-3xl flex flex-col items-center justify-center border-2 border-dashed border-slate-200 relative overflow-hidden group">
+                   <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                   <Dog className="w-10 h-10 text-slate-300 mb-2 z-10" />
+                   <span className="text-xs text-slate-400 uppercase tracking-widest font-bold z-10">Recommended Device Preview</span>
+                </div>
+
+                {/* SOCIAL PROOF SECOND */}
+                <div className="w-full max-w-lg space-y-6 pt-4">
+                  <div className="flex items-center justify-center gap-3 text-brand-primary text-sm font-bold uppercase tracking-widest">
+                    <ShieldCheck className="w-5 h-5" />
+                    Trusted by 450+ Licensed Trainers
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white p-6 md:p-8 rounded-3xl text-left border border-slate-100 shadow-sm">
-                      <div className="flex gap-1 mb-3">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} className="w-3 h-3 text-amber-400 fill-amber-400" />
-                        ))}
-                      </div>
-                      <p className="text-base text-slate-600 italic">"Our rescue used to bark at every leaf. Within 2 days of using this ultrasonic method, the peace was restored. Truly humane!"</p>
-                      <p className="text-xs font-bold mt-4 uppercase tracking-tighter text-slate-400">— Robert K., Certified Trainer</p>
+                  <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl text-left border border-white shadow-sm ring-1 ring-slate-100">
+                    <div className="flex gap-1 mb-3">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} className="w-3 h-3 text-amber-400 fill-amber-400" />
+                      ))}
                     </div>
-                    {/* Additional Social Proof */}
-                    <div className="bg-white p-6 md:p-8 rounded-3xl text-left border border-slate-100 shadow-sm">
-                      <div className="flex gap-1 mb-3">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} className="w-3 h-3 text-amber-400 fill-amber-400" />
-                        ))}
-                      </div>
-                      <p className="text-base text-slate-600 italic">"I was skeptical but desperate. This assessment pointed me to exactly what I needed. No more neighbor complaints at 2 AM!"</p>
-                      <p className="text-xs font-bold mt-4 uppercase tracking-tighter text-slate-400">— Sarah J., Labrador Owner</p>
+                    <p className="text-base text-slate-600 leading-relaxed italic">"Our rescue used to bark at every leaf. Within 2 days of using this ultrasonic method, the peace was restored. Truly humane and life-changing."</p>
+                    <div className="flex items-center gap-3 mt-4">
+                      <div className="w-8 h-8 rounded-full bg-slate-200" />
+                      <p className="text-sm font-bold text-slate-800">— Robert K., Certified Trainer</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1"></div>
+                <motion.button
+                  whileHover={{ scale: 1.05, color: "#7A9D96" }}
+                  onClick={handleShare}
+                  className="flex items-center gap-2 text-slate-400 text-sm font-medium hover:text-brand-primary transition-colors py-4"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share your results with family
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>
         </main>
-
-        {/* Footer - New Legal Section with larger font */}
-        <footer className="mt-24 pt-12 border-t border-slate-100 flex flex-col items-center gap-10">
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-6 text-sm md:text-base font-bold text-slate-500 tracking-[0.1em] uppercase">
-            <a href="#" className="hover:text-brand-primary transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-brand-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-brand-primary transition-colors">Safety Disclaimer</a>
-          </div>
-          
-          <div className="text-center max-w-2xl">
-            <p className="text-sm md:text-base text-slate-400 leading-relaxed font-light px-4">
-              Disclaimer: Results may vary based on dog breed, behavior history, and environment. This assessment is not a substitute for professional veterinary advice.
-            </p>
-            <p className="text-xs md:text-sm text-slate-300 mt-8 font-black tracking-[0.2em] uppercase">
-              © 2026 QuietPaws Behavioral Research • All Rights Reserved
-            </p>
-          </div>
-          <div className="pb-8"></div>
-        </footer>
       </div>
+
+      {/* Footer Links */}
+      <footer className="w-full bg-white/30 backdrop-blur-md py-10 px-6 border-t border-slate-200 mt-20">
+        <div className="max-w-4xl mx-auto flex flex-col items-center space-y-6">
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+            {['Terms of Service', 'Privacy Policy', 'Disclaimer', 'Contact Us'].map((item) => (
+              <a 
+                key={item}
+                href="https://go.wisecombo.com/click" 
+                className="text-[11px] uppercase tracking-widest font-bold text-slate-400 hover:text-brand-primary transition-colors"
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wider text-center space-y-1">
+            <p>© 2026 QuietPaws Behavioral Research Group</p>
+            <p className="max-w-md opacity-60">Results may vary based on dog temperament. Always combine technology with consistent behavioral reinforcement.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
