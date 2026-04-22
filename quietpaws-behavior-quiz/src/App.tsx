@@ -266,16 +266,25 @@ export default function App() {
 
                 {/* CTA BUTTON FIRST */}
                 <div className="w-full max-w-md space-y-4">
+
+<!--Optional, send client hints to get accurate device data-->
+<meta http-equiv="delegate-ch" content="sec-ch-ua https://go.wisecombo.com; sec-ch-ua-mobile https://go.wisecombo.com; sec-ch-ua-arch https://go.wisecombo.com; sec-ch-ua-model https://go.wisecombo.com; sec-ch-ua-platform https://go.wisecombo.com; sec-ch-ua-platform-version https://go.wisecombo.com; sec-ch-ua-bitness https://go.wisecombo.com; sec-ch-ua-full-version-list https://go.wisecombo.com; sec-ch-ua-full-version https://go.wisecombo.com" />
+
+<!-- MaxConv Tracking Script Base Code-->
+<script>!function(w,d,o,n,c){w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};var s=d.createElement(n),t=d.getElementsByTagName(n)[0];s.async=!0;s.defer=!0;s.src="//go.wisecombo.com/t/c32cd28b-5281-47cd-ba1c-955bbdf577fb.js";t.parentNode.insertBefore(s,t);}(window,document,"maxconv","script");</script>
+<noscript><link rel="stylesheet" href="//go.wisecombo.com/t/t.css?mc_ns=1&mc_cmp=c32cd28b-5281-47cd-ba1c-955bbdf577fb&mc_tid=" /></noscript>
+<!-- End MaxConv Tracking Script Base Code-->
                   
-                  <motion.a
-  animate={{ scale: [1, 1.02, 1] }}
-  transition={{ duration: 2, repeat: Infinity }}
-  className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 cursor-pointer"
-  href="https://go.wisecombo.com/click"
->
-  <Award className="w-6 h-6" />
-  Claim Your Device
-</motion.a>
+                 <motion.button
+                    animate={{ scale: [1, 1.02, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3"
+                    onClick={() => window.location.href = 'https://go.wisecombo.com/click'}
+                  >
+                    <Award className="w-6 h-6" />
+                    Claim Your Device
+                  </motion.button>
+                  
                   <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] font-bold">
                     Official Expert Recommended Solution
                   </p>
