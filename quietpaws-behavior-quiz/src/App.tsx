@@ -135,12 +135,12 @@ export default function App() {
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-[0.15em] text-ink uppercase leading-none">QuietPaws</span>
-              <span className="text-[10px] font-bold tracking-[0.4em] text-sage uppercase mt-0.5 ml-0.5">Laboratory</span>
+              <span className="text-2xl font-bold tracking-[0.15em] text-ink uppercase leading-none">QuietPaws</span>
+              <span className="text-[13px] font-bold tracking-[0.4em] text-sage uppercase mt-1 ml-0.5">Laboratory</span>
             </div>
           </div>
         </div>
-        <div className="text-[9px] uppercase font-bold tracking-[0.05em] opacity-40 mt-2">Certified Canine Behavior Assessment</div>
+        <div className="text-[11px] uppercase font-bold tracking-[0.08em] opacity-50 mt-3">Certified Canine Behavior Assessment</div>
       </header>
 
       <main className="relative z-10 w-full max-w-lg mx-auto px-6 py-8 pb-20">
@@ -392,28 +392,26 @@ export default function App() {
              </p>
           </div>
 
-          {/* Social Sharing */}
           <div className="pt-6 text-center space-y-4 border-t border-divider border-dashed">
             <p className="text-xs font-serif italic text-ink/60">Share your results with other pet parents:</p>
-            <div className="flex justify-center gap-3">
+            <div className="flex justify-center gap-4">
               <a 
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://survey.wooddup.com')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
+                className="w-11 h-11 rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
                 title="Share on Facebook"
               >
-                <Facebook size={18} />
+                <Facebook size={20} fill="currentColor" />
               </a>
               <a 
                 href={`https://twitter.com/intent/tweet?url=${encodeURIComponent('https://survey.wooddup.com')}&text=${encodeURIComponent("I just found a humane solution for my dog's barking! Check out QuietPaws Lab.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
+                className="w-11 h-11 rounded-full bg-black flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
                 title="Share on X"
               >
-                {/* SVG for X.com logo style */}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                 </svg>
               </a>
@@ -421,19 +419,19 @@ export default function App() {
                 href="https://www.instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
+                className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
                 title="Follow on Instagram"
               >
-                <Instagram size={18} />
+                <Instagram size={20} />
               </a>
               <a 
                 href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent('https://survey.wooddup.com')}&media=${encodeURIComponent('https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=1200&h=630')}&description=${encodeURIComponent("Find the most humane and effective barking solution for your dog.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
+                className="w-11 h-11 rounded-full bg-[#E60023] flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
                 title="Pin on Pinterest"
               >
-                <Share2 size={18} />
+                <Share2 size={20} fill="currentColor" />
               </a>
             </div>
           </div>
