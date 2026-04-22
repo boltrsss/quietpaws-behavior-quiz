@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Facebook,
   Twitter,
+  Instagram,
   Share2
 } from 'lucide-react';
 
@@ -319,47 +320,6 @@ export default function App() {
             </motion.div>
           )}
 
-          {step === 'result' && (
-            <motion.div
-              key="result"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="space-y-8"
-            >
-              <div className="bg-white border border-divider p-8 rounded-[40px] space-y-6 shadow-xl relative overflow-hidden">
-                <div className="space-y-4">
-                  <div className="inline-block py-1.5 px-3 bg-[#E8EBE9] text-sage-dark text-[10px] font-bold uppercase tracking-wider rounded-md">
-                    Expert Recommendation
-                  </div>
-                  <h3 className="text-3xl font-serif leading-tight">Your Serenity Plan is Ready</h3>
-                </div>
-
-                <div className="space-y-4 text-ink/80 text-[15px] leading-relaxed">
-                  <p>Based on your <strong className="text-sage-dark">{answers[1]} dog's</strong> response to <strong className="text-sage-dark">{answers[2]}</strong>, we have identified a high cognitive sensitivity to auditory cues.</p>
-                  <p>Expert recommendation: An automated, non-invasive correction system using <strong className="text-sage-dark">variable frequency ultrasonic waves</strong> will be most effective. This signals "calm" to the canine brain without causing distress or pain.</p>
-                </div>
-
-                <div className="pt-6 border-t border-divider">
-                  <div className="flex items-center gap-5">
-                    <div className="w-20 h-20 bg-paper rounded-2xl flex items-center justify-center p-3 border border-divider">
-                      <VolumeX size={36} className="text-sage" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">Device Recommended</p>
-                      <a 
-                        href="https://go.wisecombo.com/click" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="font-serif italic text-xl text-ink hover:text-sage transition-colors border-b border-sage/30 hover:border-sage"
-                      >
-                        Nobark Ultra
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
 
         {/* 
@@ -368,7 +328,42 @@ export default function App() {
             Visibility is toggled via CSS classes (hidden/block) rather than 
             React conditional rendering.
         */}
-        <div className={step === 'result' ? 'block mt-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700' : 'hidden'}>
+        <div className={step === 'result' ? 'block mt-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700' : 'hidden md:hidden'}>
+          {/* Result Card: Expert Recommendation */}
+          <div className="bg-white border border-divider p-8 rounded-[40px] space-y-6 shadow-xl relative overflow-hidden">
+            <div className="space-y-4">
+              <div className="inline-block py-1.5 px-3 bg-[#E8EBE9] text-sage-dark text-[10px] font-bold uppercase tracking-wider rounded-md">
+                Expert Recommendation
+              </div>
+              <h3 className="text-3xl font-serif leading-tight">Your Serenity Plan is Ready</h3>
+            </div>
+
+            <div className="space-y-4 text-ink/80 text-[15px] leading-relaxed">
+              <p>Based on your <strong className="text-sage-dark">{answers[1] || '---'} dog's</strong> response to <strong className="text-sage-dark">{answers[2] || '---'}</strong>, we have identified a high cognitive sensitivity to auditory cues.</p>
+              <p>Expert recommendation: An automated, non-invasive correction system using <strong className="text-sage-dark">variable frequency ultrasonic waves</strong> will be most effective. This signals "calm" to the canine brain without causing distress or pain.</p>
+            </div>
+
+            <div className="pt-6 border-t border-divider">
+              <div className="flex items-center gap-5">
+                <div className="w-20 h-20 bg-paper rounded-2xl flex items-center justify-center p-3 border border-divider">
+                  <VolumeX size={36} className="text-sage" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">Device Recommended</p>
+                  <a 
+                    href="https://go.wisecombo.com/click" 
+                    id="nobark-link"
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="font-serif italic text-xl text-ink hover:text-sage transition-colors border-b border-sage/30 hover:border-sage"
+                  >
+                    Nobark Ultra
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Results Stats */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white p-6 rounded-3xl border border-divider flex flex-col gap-1.5 shadow-sm">
@@ -402,7 +397,7 @@ export default function App() {
             <p className="text-xs font-serif italic text-ink/60">Share your results with other pet parents:</p>
             <div className="flex justify-center gap-3">
               <a 
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://go.wisecombo.com/click')}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://survey.wooddup.com')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
@@ -411,16 +406,28 @@ export default function App() {
                 <Facebook size={18} />
               </a>
               <a 
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent('https://go.wisecombo.com/click')}&text=${encodeURIComponent("I just found a humane solution for my dog's barking! Check out QuietHome AI.")}`}
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent('https://survey.wooddup.com')}&text=${encodeURIComponent("I just found a humane solution for my dog's barking! Check out QuietPaws Lab.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
-                title="Share on Twitter"
+                title="Share on X"
               >
-                <Twitter size={18} />
+                {/* SVG for X.com logo style */}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
               </a>
               <a 
-                href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent('https://go.wisecombo.com/click')}&media=${encodeURIComponent('https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=1200&h=630')}&description=${encodeURIComponent("Find the most humane and effective barking solution for your dog.")}`}
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
+                title="Follow on Instagram"
+              >
+                <Instagram size={18} />
+              </a>
+              <a 
+                href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent('https://survey.wooddup.com')}&media=${encodeURIComponent('https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=1200&h=630')}&description=${encodeURIComponent("Find the most humane and effective barking solution for your dog.")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white border border-divider flex items-center justify-center text-ink/40 hover:text-sage hover:border-sage transition-all shadow-sm"
