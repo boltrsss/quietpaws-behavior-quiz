@@ -81,29 +81,36 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleShare = async () => {
-    const shareData = {
-      title: 'QuietPaws Dog Behavior Quiz',
-      text: 'I just took the QuietPaws Dog Behavior Quiz and got my custom serenity plan! Check it out:',
-      url: window.location.href,
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        // Using a subtle status message instead of a harsh alert
-        const btn = document.getElementById('share-btn');
-        if (btn) {
-          const originalText = btn.innerHTML;
-          btn.innerText = 'Link Copied!';
-          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+  const handleShare = (platform: string) => {
+    const url = window.location.href;
+    const text = 'I just took the QuietPaws Dog Behavior Quiz and got my custom serenity plan! Check it out:';
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'x':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+        break;
+      case 'pinterest':
+        shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${encodeURIComponent(text)}`;
+        break;
+      case 'instagram':
+        navigator.clipboard.writeText(url);
+        // Using a status update for the copy action
+        const msg = document.getElementById('share-status');
+        if (msg) {
+          msg.innerText = 'Link copied for IG!';
+          setTimeout(() => { msg.innerText = 'Share your results with family'; }, 2000);
         }
-      }
-    } catch (err) {
-      console.error('Error sharing:', err);
+        return;
+      default:
+        return;
     }
+    
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleAnswer = (answer: string) => {
@@ -300,14 +307,39 @@ export default function App() {
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.05, color: "#7A9D96" }}
-                  onClick={handleShare}
-                  className="flex items-center gap-2 text-slate-400 text-sm font-medium hover:text-brand-primary transition-colors py-4"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Share your results with family
-                </motion.button>
+                <div className="flex flex-col items-center gap-4 pt-4">
+                  <p id="share-status" className="text-slate-400 text-xs font-medium transition-all">Share your results with family</p>
+                  <div className="flex items-center gap-5">
+                    {[
+                      { id: 'facebook', icon: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>, color: '#1877F2' },
+                      { id: 'instagram', icon: <g><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></g>, color: '#E4405F' },
+                      { id: 'x', icon: <path d="M4 4l11.733 16h4.267l-11.733 -16z M4 20l6.768 -6.768 M12.456 11.544l7.544 -7.544"/>, color: '#000000' },
+                      { id: 'pinterest', icon: <g><circle cx="12" cy="12" r="10"/><path d="M8 20l4-9"/><path d="M10.7 14c.4-1.1 1.3-2 2.3-2 1.1 0 2 .9 2 2 0 1.1-.9 2-2 2-1.1 0-2-.9-2-2z"/></g>, color: '#BD081C' }
+                    ].map((platform) => (
+                      <motion.button
+                        key={platform.id}
+                        whileHover={{ scale: 1.2, y: -2 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleShare(platform.id)}
+                        className="w-10 h-10 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center transition-all"
+                        style={{ color: platform.color }}
+                      >
+                        <svg 
+                          viewBox="0 0 24 24" 
+                          width="20" 
+                          height="20" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          fill="none" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                        >
+                          {platform.icon}
+                        </svg>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
