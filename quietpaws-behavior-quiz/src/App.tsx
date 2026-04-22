@@ -355,7 +355,7 @@ export default function App() {
                     id="nobark-link"
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="font-serif italic text-xl text-ink hover:text-sage transition-colors border-b border-sage/30 hover:border-sage"
+                    className="font-serif italic text-xl font-bold text-blue-600 hover:text-blue-800 transition-colors border-b border-blue-200 hover:border-blue-600"
                   >
                     Nobark Ultra
                   </a>
