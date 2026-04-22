@@ -266,15 +266,16 @@ export default function App() {
 
                 {/* CTA BUTTON FIRST */}
                 <div className="w-full max-w-md space-y-4">
+                  
                   <motion.a
-                    animate={{ scale: [1, 1.02, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 cursor-pointer"
-                    href="https://go.wisecombo.com/click"
-                  >
-                    <Award className="w-6 h-6" />
-                    Claim Your Device
-                  </motion.a>
+  animate={{ scale: [1, 1.02, 1] }}
+  transition={{ duration: 2, repeat: Infinity }}
+  className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 cursor-pointer"
+  href="https://go.wisecombo.com/click"
+>
+  <Award className="w-6 h-6" />
+  Claim Your Device
+</motion.a>
                   <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] font-bold">
                     Official Expert Recommended Solution
                   </p>
