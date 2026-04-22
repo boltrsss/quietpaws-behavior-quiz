@@ -281,7 +281,7 @@ export default function App() {
                 </div>
 
                 <div className="w-full max-w-md aspect-video max-h-48 bg-slate-100 rounded-3xl flex flex-col items-center justify-center border-2 border-dashed border-slate-200 relative overflow-hidden group">
-                   <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                   <div className="absolute inset-0 bg-[url('https://www.consumerskills.org/wp-content/uploads/2026/04/s4-prod.webp?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-20 group-hover:opacity-30 transition-opacity"></div>
                    <Dog className="w-10 h-10 text-slate-300 mb-2 z-10" />
                    <span className="text-xs text-slate-400 uppercase tracking-widest font-bold z-10">Recommended Device Preview</span>
                 </div>
