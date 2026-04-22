@@ -266,22 +266,22 @@ export default function App() {
 
                 {/* CTA BUTTON FIRST */}
                 <div className="w-full max-w-md space-y-4">
-                  <motion.button
+                  <motion.a
                     animate={{ scale: [1, 1.02, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3"
-                    onClick={() => window.location.href = 'https://go.wisecombo.com/click'}
+                    className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 cursor-pointer"
+                    href="https://go.wisecombo.com/click"
                   >
                     <Award className="w-6 h-6" />
                     Claim Your Device
-                  </motion.button>
+                  </motion.a>
                   <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] font-bold">
                     Official Expert Recommended Solution
                   </p>
                 </div>
 
                 <div className="w-full max-w-md aspect-video max-h-48 bg-slate-100 rounded-3xl flex flex-col items-center justify-center border-2 border-dashed border-slate-200 relative overflow-hidden group">
-                   <div className="absolute inset-0 bg-[url('https://www.consumerskills.org/wp-content/uploads/2026/04/nobark-preivew.jpg?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-10 group-hover:opacity-90 transition-opacity"></div>
+                   <div className="absolute inset-0 bg-[url('https://www.consumerskills.org/wp-content/uploads/2026/04/nobark-preivew.jpg')] bg-cover bg-center opacity-20 group-hover:opacity-90 transition-opacity"></div>
                    <Dog className="w-10 h-10 text-slate-300 mb-2 z-10" />
                    <span className="text-xs text-slate-400 uppercase tracking-widest font-bold z-10">Recommended Device Preview</span>
                 </div>
