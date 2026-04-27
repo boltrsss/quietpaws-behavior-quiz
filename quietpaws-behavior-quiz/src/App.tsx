@@ -1,369 +1,469 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, ChevronRight, Dog, ShieldCheck, Heart, Sparkles, Volume2, Info, Share2, Star, Users, Award } from 'lucide-react';
+import { 
+  ChevronRight, 
+  ShieldCheck, 
+  VolumeX, 
+  Dog, 
+  HeartPulse, 
+  Sparkles,
+  ArrowRight,
+  CheckCircle2,
+  Facebook,
+  Twitter,
+  Instagram,
+  Share2
+} from 'lucide-react';
 
-interface Question {
+// Types
+type Question = {
   id: number;
-  text: string;
-  options: { value: string; label: string; icon?: any }[];
-}
+  title: string;
+  subtitle: string;
+  options: { label: string; value: string }[];
+  type: 'select' | 'scale';
+};
 
 const QUESTIONS: Question[] = [
   {
     id: 1,
-    text: "What is your dog's breed and size?",
+    title: "About Your Companion",
+    subtitle: "What is your dog's breed and physical size?",
+    type: 'select',
     options: [
-      { value: 'toy', label: 'Toy (Under 10 lbs)' },
-      { value: 'small', label: 'Small (10-25 lbs)' },
-      { value: 'medium', label: 'Medium (25-50 lbs)' },
-      { value: 'large', label: 'Large (50+ lbs)' },
+      { label: "Toy (Under 10 lbs)", value: "toy" },
+      { label: "Small (10-25 lbs)", value: "small" },
+      { label: "Medium (25-50 lbs)", value: "medium" },
+      { label: "Large (50+ lbs)", value: "large" },
     ]
   },
   {
     id: 2,
-    text: "When does the barking become most challenging?",
+    title: "Barking Triggers",
+    subtitle: "In which scenarios does your dog bark most frequently?",
+    type: 'select',
     options: [
-      { value: 'strangers', label: 'Seeing strangers or passersby' },
-      { value: 'night', label: 'In the middle of the night' },
-      { value: 'separation', label: 'When they are left alone (Separation)' },
-      { value: 'territorial', label: 'Territorial sounds or delivery alerts' },
+      { label: "Strangers / Doorbell", value: "strangers" },
+      { label: "Nighttime / Noises", value: "night" },
+      { label: "Separation Anxiety", value: "separation" },
+      { label: "Excitement / Play", value: "excitement" },
     ]
   },
   {
     id: 3,
-    text: "What training methods have you explored so far?",
+    title: "Training Journey",
+    subtitle: "Which methods have you attempted so far?",
+    type: 'select',
     options: [
-      { value: 'verbal', label: 'Verbal commands (No! Stay!)' },
-      { value: 'treats', label: 'High-value treats & distractions' },
-      { value: 'professional', label: 'Professional trainers' },
-      { value: 'none', label: "We haven't tried a consistent method yet" },
+      { label: "Verbal Commands Only", value: "verbal" },
+      { label: "Training Collars", value: "collars" },
+      { label: "Professional Trainer", value: "pro" },
+      { label: "No formal training yet", value: "none" },
     ]
   },
   {
     id: 4,
-    text: "On a scale of 1-10, how much is the barking affecting your life?",
-    options: [
-      { value: 'low', label: '1-3: Mildly annoying' },
-      { value: 'mid', label: '4-6: Frequent daily disruption' },
-      { value: 'high', label: '7-8: Affecting work, sleep, or nerves' },
-      { value: 'extreme', label: '9-10: Constant stress or neighbor complaints' },
-    ]
+    title: "Daily Impact",
+    subtitle: "How much is the barking impacting your peace of mind? (1-10)",
+    type: 'scale',
+    options: [] // Managed by slider UI
   },
   {
     id: 5,
-    text: "Which correction approach fits your philosophy best?",
+    title: "Preferred Solution",
+    subtitle: "What is your preferred approach to correcting this behavior?",
+    type: 'select',
     options: [
-      { value: 'humane', label: '100% Humane & Silent (Ultrasonic Science)' },
-      { value: 'direct', label: 'Direct Vibration Feedback' },
-      { value: 'progressive', label: 'Progressive Sound Alerts' },
-      { value: 'mixed', label: 'A Hybrid Non-Invasive Strategy' },
+      { label: "Humane Ultrasonic Sound", value: "ultrasonic" },
+      { label: "Soft Vibration Prompt", value: "vibration" },
+      { label: "Humanely Tone Warning", value: "tone" },
+      { label: "I'm open to expert advice", value: "expert" },
     ]
   }
 ];
 
 export default function App() {
-  const [currentStep, setCurrentStep] = useState(0); // 0 = quiz, 1 = loading, 2 = result
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [progress, setProgress] = useState(0);
-  const [liveProof, setLiveProof] = useState({ name: 'Sarah from NY', time: '2 mins ago' });
+  const [step, setStep] = useState<'intro' | 'quiz' | 'loading' | 'result'>('intro');
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string | number>>({});
+  const [scaleValue, setScaleValue] = useState(7);
+  const [successRate, setSuccessRate] = useState("94.3");
 
-  useEffect(() => {
-    const locations = ['Austin, TX', 'Seattle, WA', 'Miami, FL', 'Chicago, IL', 'Denver, CO'];
-    const names = ['Michael', 'Jessica', 'David', 'Emma', "Barkley's Mom"];
-    
-    const interval = setInterval(() => {
-      setLiveProof({
-        name: `${names[Math.floor(Math.random() * names.length)]} in ${locations[Math.floor(Math.random() * locations.length)]}`,
-        time: 'Just now'
-      });
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
+  const currentQuestion = QUESTIONS[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / QUESTIONS.length) * 100;
 
-  const handleShare = (platform: string) => {
-    const url = 'https://survey.wooddup.com/';
-    const text = 'I just took the QuietPaws Dog Behavior Quiz and got my custom serenity plan! Check it out:';
-    
-    let shareUrl = '';
-    
-    switch (platform) {
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-        break;
-      case 'x':
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-        break;
-      case 'pinterest':
-        const imageUrl = 'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&q=80&w=1200&h=630';
-        shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(text)}`;
-        break;
-      case 'instagram':
-        navigator.clipboard.writeText(url);
-        // Using a status update for the copy action
-        const msg = document.getElementById('share-status');
-        if (msg) {
-          msg.innerText = 'Link copied for IG!';
-          setTimeout(() => { msg.innerText = 'Share your results with family'; }, 2000);
-        }
-        return;
-      default:
-        return;
-    }
-    
-    window.open(shareUrl, '_blank', 'noopener,noreferrer');
-  };
+  const handleNext = (value: string | number) => {
+    const newAnswers = { ...answers, [currentQuestion.id]: value };
+    setAnswers(newAnswers);
 
-  const handleAnswer = (answer: string) => {
-    setAnswers({ ...answers, [QUESTIONS[currentQuestion].id]: answer });
-    
-    if (currentQuestion < QUESTIONS.length - 1) {
-      setTimeout(() => {
-        setCurrentQuestion(currentQuestion + 1);
-        setProgress(((currentQuestion + 1) / QUESTIONS.length) * 100);
-      }, 300);
+    if (currentQuestionIndex < QUESTIONS.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      setTimeout(() => {
-        setProgress(100);
-        setCurrentStep(1);
-      }, 300);
+      setStep('loading');
     }
   };
 
   useEffect(() => {
-    if (currentStep === 1) {
+    if (step === 'loading') {
+      // Generate a random success rate between 90.0% and 98.9%
+      const rate = (Math.random() * (98.9 - 90.0) + 90.0).toFixed(1);
+      setSuccessRate(rate);
+
       const timer = setTimeout(() => {
-        setCurrentStep(2);
-      }, 2500);
+        setStep('result');
+      }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [currentStep]);
+  }, [step]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-bg font-sans relative overflow-x-hidden">
-      {/* Live Social Proof Bubble (Desktop only) */}
-      <AnimatePresence>
-        {currentStep < 2 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            key={liveProof.name}
-            className="fixed bottom-12 left-6 z-50 bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg rounded-2xl p-3 items-center gap-3 max-w-[240px] pointer-events-none hidden lg:flex"
-          >
-            <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary">
-              <Users className="w-4 h-4" />
+    <div className="min-h-screen font-sans text-ink bg-paper overflow-x-hidden selection:bg-sage/20">
+      <header className="relative z-10 w-full max-w-lg mx-auto pt-12 pb-6 px-6 flex flex-col items-center border-b border-divider">
+        <div className="flex flex-col items-center group">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-sage flex items-center justify-center text-white shadow-lg shadow-sage/20">
+                <Dog size={20} strokeWidth={2.5} />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-sage-dark border-2 border-paper flex items-center justify-center">
+                <Sparkles size={8} className="text-white" />
+              </div>
             </div>
             <div className="flex flex-col">
-              <p className="text-[10px] font-bold text-slate-800 leading-tight">{liveProof.name}</p>
-              <p className="text-[9px] text-gray-500 uppercase tracking-tighter">Completed Assessment • {liveProof.time}</p>
+              <span className="text-2xl font-bold tracking-[0.15em] text-ink uppercase leading-none">QuietPaws</span>
+              <span className="text-[13px] font-bold tracking-[0.4em] text-sage uppercase mt-1 ml-0.5">Laboratory</span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex-1 w-full max-w-2xl mx-auto flex flex-col py-8 px-6 md:px-12">
-        {/* Header: Simplified to Icon + Quiz Name */}
-        <header className="flex flex-col items-center mb-12">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-sm">
-              <Dog className="w-6 h-6" />
-            </div>
-            <span className="text-2xl md:text-3xl font-serif font-semibold tracking-tight text-slate-800">QuietPaws Lab</span>
           </div>
-          
-          <div className="w-full loader-bar mt-8 relative max-w-sm">
-            <motion.div 
-              className="loader-progress relative" 
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ type: "spring", stiffness: 50, damping: 20 }}
-            >
-              <motion.div 
-                className="absolute inset-0 bg-white/30"
-                animate={{ x: ['-100%', '100%'] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              />
-            </motion.div>
-          </div>
-        </header>
+        </div>
+        <div className="text-[11px] uppercase font-bold tracking-[0.08em] opacity-50 mt-3">Certified Canine Behavior Assessment</div>
+      </header>
 
-        <main className="flex-1 flex flex-col justify-center">
-          <AnimatePresence mode="wait">
-            {currentStep === 0 && (
-              <motion.div
-                key="quiz"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-10"
-              >
-                {/* Question Text */}
-                <div className="text-center">
-                  <h2 className="text-2xl md:text-3xl font-semibold text-slate-800 leading-tight">
-                    {QUESTIONS[currentQuestion].text}
-                  </h2>
-                </div>
-
-                {/* Options */}
-                <div className="grid grid-cols-1 gap-4 max-w-lg mx-auto w-full">
-                  {QUESTIONS[currentQuestion].options.map((option) => (
-                    <motion.button
-                      key={option.value}
-                      whileHover={{ y: -2, backgroundColor: "#ffffff", borderColor: "#cbd5e1", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleAnswer(option.value)}
-                      className="w-full p-5 rounded-2xl border border-slate-200 bg-white/50 backdrop-blur-sm flex items-center justify-between text-left transition-all"
-                    >
-                      <span className="text-lg font-medium text-slate-700">
-                        {option.label}
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-slate-300" />
-                    </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {currentStep === 1 && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center space-y-8 text-center"
-              >
-                <div className="w-16 h-16 border-4 border-slate-200 border-t-brand-primary rounded-full animate-spin"></div>
-                <div className="space-y-3">
-                  <h2 className="text-2xl font-semibold text-slate-800 italic">Analyzing Behavioral Data...</h2>
-                  <p className="text-gray-400 text-lg font-light max-w-sm mx-auto">
-                    Our algorithm is cross-referencing breed size with your reported triggers.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* RESULTS SECTION: Always in DOM for tracking script */}
-          <div className={`${currentStep === 2 ? 'block' : 'hidden'}`}>
+      <main className="relative z-10 w-full max-w-lg mx-auto px-6 py-8 pb-20">
+        <AnimatePresence mode="wait">
+          {step === 'intro' && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={currentStep === 2 ? { opacity: 1, y: 0 } : {}}
-              className="space-y-10 text-center flex flex-col items-center"
+              key="intro"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-8"
+            >
+              <div className="aspect-[4/3] rounded-[32px] bg-stone-200 overflow-hidden relative group border border-divider shadow-sm">
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                 <img 
+                    src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=800" 
+                    alt="Happy dog"
+                    className="w-full h-full object-cover grayscale-[10%] group-hover:scale-105 transition-transform duration-1000"
+                    referrerPolicy="no-referrer"
+                 />
+                 <div className="absolute bottom-6 left-6 right-6">
+                    <p className="text-white font-serif italic text-xl leading-snug">"Barking isn't a problem, it's communication that needs a better outlet."</p>
+                    <p className="text-white/80 text-xs mt-2 font-bold tracking-tight">— Dr. Elias Sterling</p>
+                 </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sage/80 mb-2">
+                  <Dog size={16} />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">2026 Behavior Study</span>
+                </div>
+                <h1 className="text-3xl font-serif leading-[1.2] text-ink">
+                  Restore serenity to your home today.
+                </h1>
+                <p className="text-ink/70 leading-relaxed text-[15px]">
+                  Answer 5 expert-curated questions to receive your custom behavior adjustment plan and equipment recommendation.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setStep('quiz')}
+                id="start-quiz-btn"
+                className="w-full bg-sage text-white py-5 rounded-[20px] font-bold text-base flex items-center justify-center gap-2 hover:bg-sage-dark transition-all shadow-lg active:scale-95"
+              >
+                Begin Assessment
+                <ChevronRight size={18} />
+              </button>
+              
+              <div className="flex items-center justify-center gap-8 pt-4 text-ink/40">
+                <div className="flex flex-col items-center gap-1">
+                  <ShieldCheck size={20} />
+                  <span className="text-[9px] uppercase font-bold tracking-[0.1em]">Safe</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <VolumeX size={20} />
+                  <span className="text-[9px] uppercase font-bold tracking-[0.1em]">Humane</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <HeartPulse size={20} />
+                  <span className="text-[9px] uppercase font-bold tracking-[0.1em]">Expert</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 'quiz' && (
+            <motion.div
+              key={`q-${currentQuestionIndex}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-8"
             >
               <div className="space-y-4">
-                <div className="flex justify-center gap-1.5">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <h2 className="text-3xl md:text-4xl font-semibold text-slate-800 leading-tight">Your Home Serenity Plan</h2>
-              </div>
-              
-              <div className="max-w-xl bg-white/40 backdrop-blur-sm p-8 rounded-3xl border border-white/50 shadow-sm">
-                <p className="text-lg md:text-xl text-slate-600 leading-relaxed italic">
-                  "Based on your dog's triggers, we recommend a <span className="font-extrabold text-black bg-yellow-300 px-2 py-0.5 rounded-md shadow-md ring-1 ring-yellow-400/50">Passive Ultrasonic Intervention</span>. This method communicates in their language without stress, reducing bark incidents by up to 94%."
-                </p>
-              </div>
-
-              {/* NATIVE <a> CTA: Present in DOM from start */}
-              <div className="w-full max-w-md space-y-4 font-sans">
-                <a
-                  href="https://go.wisecombo.com/click"
-                  className="w-full py-5 px-8 rounded-full bg-brand-secondary text-white font-bold uppercase tracking-widest text-lg shadow-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 no-underline decoration-0 animate-pulse"
-                  id="final-cta"
-                >
-                  <Award className="w-6 h-6" />
-                  Claim Your Device
-                </a>
-                <p className="text-[11px] text-slate-400 uppercase tracking-[0.2em] font-bold">
-                  Official Expert Recommended Solution
-                </p>
-              </div>
-
-              <div className="w-full max-w-md aspect-video max-h-48 bg-slate-100 rounded-3xl flex flex-col items-center justify-center border-2 border-dashed border-slate-200 relative overflow-hidden group">
-                 <div className="absolute inset-0 bg-[url('https://www.consumerskills.org/wp-content/uploads/2026/04/nobark-preivew.jpg?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-80 group-hover:opacity-80 transition-opacity"></div>
-                 <Dog className="w-10 h-10 text-slate-300 mb-2 z-10" />
-                 <span className="text-xs text-slate-400 uppercase tracking-widest font-bold z-10">Recommended Device Preview</span>
-              </div>
-
-              {/* SOCIAL PROOF SECOND */}
-              <div className="w-full max-w-lg space-y-6 pt-4">
-                <div className="flex items-center justify-center gap-3 text-brand-primary text-sm font-bold uppercase tracking-widest">
-                  <ShieldCheck className="w-5 h-5" />
-                  Trusted by 450+ Licensed Trainers
+                <div className="flex items-center gap-2 text-sage/60">
+                  <Dog size={16} />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Bark Behavior Analysis</span>
                 </div>
                 
-                <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl text-left border border-white shadow-sm ring-1 ring-slate-100">
-                  <div className="flex gap-1 mb-3">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    ))}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end">
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Step {currentQuestionIndex + 1} of 5</span>
+                    <span className="text-xs font-serif italic opacity-60">{currentQuestion.title}</span>
                   </div>
-                  <p className="text-base text-slate-600 leading-relaxed italic">"Our rescue used to bark at every leaf. Within 2 days of using this ultrasonic method, the peace was restored. Truly humane and life-changing."</p>
-                  <div className="flex items-center gap-3 mt-4">
-                    <div className="w-8 h-8 rounded-full bg-slate-200" />
-                    <p className="text-sm font-bold text-slate-800">— Robert K., Certified Trainer</p>
+                  <div className="h-1 w-full bg-divider rounded-full overflow-hidden">
+                    <motion.div 
+                      className="h-full bg-sage"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.6 }}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-4 pt-4">
-                <p id="share-status" className="text-slate-400 text-xs font-medium transition-all">Share your results with family</p>
-                <div className="flex items-center gap-5">
-                  {[
-                    { id: 'facebook', icon: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>, color: '#1877F2' },
-                    { id: 'instagram', icon: <g><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></g>, color: '#E4405F' },
-                    { id: 'x', icon: <path d="M4 4l11.733 16h4.267l-11.733 -16z M4 20l6.768 -6.768 M12.456 11.544l7.544 -7.544"/>, color: '#000000' },
-                    { id: 'pinterest', icon: <g><circle cx="12" cy="12" r="10"/><path d="M8 20l4-9"/><path d="M10.7 14c.4-1.1 1.3-2 2.3-2 1.1 0 2 .9 2 2 0 1.1-.9 2-2 2-1.1 0-2-.9-2-2z"/></g>, color: '#BD081C' }
-                  ].map((platform) => (
+              <h2 className="text-2xl font-serif leading-[1.3] text-ink">
+                {currentQuestion.subtitle}
+              </h2>
+
+              <div className="space-y-3">
+                {currentQuestion.type === 'select' ? (
+                  currentQuestion.options.map((opt, i) => (
                     <motion.button
-                      key={platform.id}
-                      whileHover={{ scale: 1.2, y: -2 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleShare(platform.id)}
-                      className="w-10 h-10 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center transition-all"
-                      style={{ color: platform.color }}
+                      key={opt.value}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08 }}
+                      onClick={() => handleNext(opt.value)}
+                      className="w-full text-left p-5 rounded-2xl border border-divider bg-white hover:border-sage hover:bg-[#f0f2f0] transition-all group flex items-center justify-between shadow-sm"
                     >
-                      <svg 
-                        viewBox="0 0 24 24" 
-                        width="20" 
-                        height="20" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        fill="none" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                      >
-                        {platform.icon}
-                      </svg>
+                      <span className="font-semibold text-ink/90">{opt.label}</span>
+                      <ChevronRight size={18} className="opacity-20 group-hover:opacity-60 transition-opacity" />
                     </motion.button>
-                  ))}
+                  ))
+                ) : (
+                  <div className="space-y-12 py-6">
+                    <div className="flex justify-between text-4xl font-serif opacity-20">
+                      <span>1</span>
+                      <span className="text-sage opacity-100">{scaleValue}</span>
+                      <span>10</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="1" 
+                      max="10" 
+                      step="1"
+                      value={scaleValue}
+                      onChange={(e) => setScaleValue(parseInt(e.target.value))}
+                      className="w-full h-1.5 bg-divider rounded-lg appearance-none cursor-pointer accent-sage"
+                    />
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest opacity-40">
+                      <span>Minor Nuisance</span>
+                      <span>Major Stress</span>
+                    </div>
+                    <button
+                      onClick={() => handleNext(scaleValue)}
+                      className="w-full bg-sage text-white py-5 rounded-[20px] font-bold shadow-lg hover:bg-sage-dark transition-all active:scale-95"
+                    >
+                      Next Step
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {step === 'loading' && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-20 space-y-8"
+            >
+              <div className="relative">
+                <motion.div 
+                  className="w-20 h-20 rounded-full border-2 border-sage/20 border-t-sage"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                />
+                <motion.div 
+                  className="absolute inset-0 flex items-center justify-center text-sage"
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <Sparkles size={28} />
+                </motion.div>
+              </div>
+              <div className="text-center space-y-3">
+                <h3 className="text-2xl font-serif">Analyzing Dog Data...</h3>
+                <p className="text-ink/60 text-sm font-medium">Generating custom behavior report</p>
+                <div className="pt-6 flex flex-col gap-3 text-ink/50 text-[11px] font-bold uppercase tracking-wider">
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>✓ Breed Correlation Complete</motion.p>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>✓ Sound Sensitivity Mapped</motion.p>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0 }}>✓ Recommendation Locked</motion.p>
                 </div>
               </div>
             </motion.div>
-          </div>
-        </main>
-      </div>
+          )}
 
-      {/* Footer Links */}
-      <footer className="w-full bg-white/30 backdrop-blur-md py-10 px-6 border-t border-slate-200 mt-20">
-        <div className="max-w-4xl mx-auto flex flex-col items-center space-y-6">
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
-            {['Terms of Service', 'Privacy Policy', 'Disclaimer', 'Contact Us'].map((item) => (
+        </AnimatePresence>
+
+        {/* 
+            PERSISTENT SECTION: 
+            This exists in the DOM from Page Load to satisfy tracking scripts.
+            Visibility is toggled via CSS classes (hidden/block) rather than 
+            React conditional rendering.
+        */}
+        <div className={step === 'result' ? 'block mt-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700' : 'hidden md:hidden'}>
+          {/* Result Card: Expert Recommendation */}
+          <div className="bg-white border border-divider p-8 rounded-[40px] space-y-6 shadow-xl relative overflow-hidden">
+            <div className="space-y-4">
+              <div className="inline-block py-1.5 px-3 bg-[#E8EBE9] text-sage-dark text-[10px] font-bold uppercase tracking-wider rounded-md">
+                Expert Recommendation
+              </div>
+              <h3 className="text-3xl font-serif leading-tight">Your Serenity Plan is Ready</h3>
+            </div>
+
+            <div className="space-y-4 text-ink/80 text-[15px] leading-relaxed">
+              <p>Based on your <strong className="text-sage-dark">{answers[1] || '---'} dog's</strong> response to <strong className="text-sage-dark">{answers[2] || '---'}</strong>, we have identified a high cognitive sensitivity to auditory cues.</p>
+              <p>Expert recommendation: An automated, non-invasive correction system using <strong className="text-sage-dark">variable frequency ultrasonic waves</strong> will be most effective. This signals "calm" to the canine brain without causing distress or pain.</p>
+            </div>
+
+            <div className="pt-6 border-t border-divider">
+              <div className="flex items-center gap-5">
+                <div className="w-20 h-20 bg-paper rounded-2xl flex items-center justify-center p-3 border border-divider">
+                  <VolumeX size={36} className="text-sage" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest font-bold opacity-40">Device Recommended</p>
+                  <a 
+                    href="https://go.wisecombo.com/click" 
+                    id="nobark-link"
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="font-serif italic text-xl font-bold text-blue-600 hover:text-blue-800 transition-colors border-b border-blue-200 hover:border-blue-600"
+                  >
+                    Nobark Ultra
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Results Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white p-6 rounded-3xl border border-divider flex flex-col gap-1.5 shadow-sm">
+              <p className="text-[10px] font-bold uppercase tracking-tight opacity-40">Success Rate</p>
+              <p className="text-3xl font-serif">{successRate}%</p>
+            </div>
+            <div className="bg-white p-6 rounded-3xl border border-divider flex flex-col gap-1.5 shadow-sm">
+              <p className="text-[10px] font-bold uppercase tracking-tight opacity-40">US Approved</p>
+              <p className="text-3xl font-serif">Humane</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 text-center">
+             {/* THE PERSISTENT CTA - Must have #cta-button and be native <a> */}
+             <a 
+              href="https://go.wisecombo.com/click"
+              id="cta-button"
+              className="w-full bg-sage text-white py-6 rounded-full font-bold text-lg shadow-xl shadow-sage/20 flex items-center justify-center gap-2 animate-pulse-editorial hover:bg-sage-dark transition-colors"
+             >
+              GET YOUR RECOMMENDATION 
+              <ArrowRight size={20} />
+             </a>
+             
+             <p className="text-[10px] uppercase font-bold tracking-widest opacity-40">
+              60-Day Money Back Guarantee • No Questions Asked
+             </p>
+          </div>
+
+          <div className="pt-6 text-center space-y-4 border-t border-divider border-dashed">
+            <p className="text-xs font-serif italic text-ink/60">Share your results with other pet parents:</p>
+            <div className="flex justify-center gap-4">
               <a 
-                key={item}
-                href="https://go.wisecombo.com/click" 
-                className="text-[11px] uppercase tracking-widest font-bold text-slate-400 hover:text-brand-primary transition-colors"
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://survey.wooddup.com')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full bg-[#1877F2] flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
+                title="Share on Facebook"
               >
-                {item}
+                <Facebook size={20} fill="currentColor" />
               </a>
-            ))}
+              <a 
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent('https://survey.wooddup.com')}&text=${encodeURIComponent("I just found a humane solution for my dog's barking! Check out QuietPaws Lab.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full bg-black flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
+                title="Share on X"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a 
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
+                title="Follow on Instagram"
+              >
+                <Instagram size={20} />
+              </a>
+              <a 
+                href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent('https://survey.wooddup.com')}&media=${encodeURIComponent('https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=1200&h=630')}&description=${encodeURIComponent("Find the most humane and effective barking solution for your dog.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full bg-[#E60023] flex items-center justify-center text-white transition-transform hover:scale-110 shadow-md"
+                title="Pin on Pinterest"
+              >
+                <Share2 size={20} fill="currentColor" />
+              </a>
+            </div>
           </div>
-          <div className="text-[10px] text-slate-400 uppercase tracking-wider text-center space-y-1">
-            <p>© 2026 QuietPaws Behavioral Research Group</p>
-            <p className="max-w-md opacity-60">Results may vary based on dog temperament. Always combine technology with consistent behavioral reinforcement.</p>
+
+          {/* Social Proof */}
+          <div className="pt-8 border-t border-divider space-y-5">
+            <p className="text-center font-serif italic text-ink/50">Trusted by over 12,000 households nationwide</p>
+            <div className="flex justify-center -space-x-3">
+              {[1,2,3,4,5].map(i => (
+                <div key={i} className="w-11 h-11 rounded-full border-2 border-paper bg-stone-200 overflow-hidden shadow-sm">
+                  <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                </div>
+              ))}
+              <div className="w-11 h-11 rounded-full border-2 border-paper bg-sage-dark flex items-center justify-center text-[10px] text-white font-bold shadow-sm">
+                +12k
+              </div>
+            </div>
           </div>
+        </div>
+      </main>
+
+      <footer className="w-full max-w-lg mx-auto py-12 px-6 text-center space-y-6 opacity-40 border-t border-divider mt-10">
+        <div className="flex justify-center gap-4 text-[9px] uppercase font-bold tracking-widest">
+          <a href="https://go.wisecombo.com/click" target="_blank" rel="noopener noreferrer" className="hover:text-sage transition-colors">Privacy Policy</a>
+          <span>•</span>
+          <a href="https://go.wisecombo.com/click" target="_blank" rel="noopener noreferrer" className="hover:text-sage transition-colors">Terms of Service</a>
+          <span>•</span>
+          <a href="https://go.wisecombo.com/click" target="_blank" rel="noopener noreferrer" className="hover:text-sage transition-colors">Disclaimer</a>
+        </div>
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase tracking-widest font-bold">© 2026 QuietHome AI Behavior Systems</p>
+          <p className="text-[9px] leading-relaxed max-w-xs mx-auto text-center font-medium">This assessment is for educational purposes. Consult a professional behaviorist for individualized medical advice.</p>
         </div>
       </footer>
     </div>
